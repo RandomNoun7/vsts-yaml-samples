@@ -1,0 +1,19 @@
+phases:
+  # This and the next task execute in parallel.
+  - phase: adhocPowershell
+    steps:
+    - script: powershell "Get-ChildItem . -recurse"
+  
+  - phase: testScript
+    steps:
+    # Script task is just executing cmd, so we can run any cmd commands we want first and then exec PowerShell.
+    - script: | 
+       set foo=bar
+       powershell ./PowerShell/deploy.ps1
+
+  # This task will wait for the adhocPowerShell task to execute.
+  - phase: executeScript
+    steps:
+    - script: powershell ./PowerShell/deploy.ps1
+    dependsOn:
+      - adhocPowershell
